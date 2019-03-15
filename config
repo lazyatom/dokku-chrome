@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+export CHROME_IMAGE=${CHROME_IMAGE:="browserless/chrome"}
+export CHROME_IMAGE_VERSION=${CHROME_IMAGE_VERSION:="latest"}
+export CHROME_ROOT=${CHROME_ROOT:="/var/lib/dokku/services/chrome"}
+export CHROME_HOST_ROOT=${CHROME_HOST_ROOT:=$CHROME_ROOT}
+
+export PLUGIN_UNIMPLEMENTED_SUBCOMMANDS=("backup" "backup-auth" "backup-deauth" "backup-schedule" "backup-schedule-cat" "backup-set-encryption" "backup-unschedule" "backup-unset-encryption" "clone" "connect" "export" "import")
+export PLUGIN_COMMAND_PREFIX="chrome"
+export PLUGIN_CONFIG_ROOT=${PLUGIN_CONFIG_ROOT:="$DOKKU_LIB_ROOT/config/$PLUGIN_COMMAND_PREFIX"}
+export PLUGIN_DATA_ROOT=${PLUGIN_CONFIG_ROOT:="$DOKKU_LIB_ROOT/data/$PLUGIN_COMMAND_PREFIX"}
+export PLUGIN_DATA_HOST_ROOT=$CHROME_HOST_ROOT
+export PLUGIN_PORTS=(3000)
+export PLUGIN_WAIT_PORT=3000
+export PLUGIN_DEFAULT_ALIAS="CHROME"
+export PLUGIN_DISABLE_PULL=${CHROME_DISABLE_PULL:=}
+export PLUGIN_DISABLE_PULL_VARIABLE="CHROME_DISABLE_PULL"
+export PLUGIN_ALT_ALIAS="DOKKU_CHROME"
+export PLUGIN_IMAGE=$CHROME_IMAGE
+export PLUGIN_IMAGE_VERSION=$CHROME_IMAGE_VERSION
+export PLUGIN_SCHEME="http"
+export PLUGIN_SERVICE="Chrome"
+export PLUGIN_VARIABLE="CHROME"
+export PLUGIN_BASE_PATH="$PLUGIN_PATH"
+if [[ -n $DOKKU_API_VERSION ]]; then
+  export PLUGIN_BASE_PATH="$PLUGIN_ENABLED_PATH"
+fi
+
+if [[ -d "$PLUGIN_DATA_ROOT/*" ]]; then
+  rm -rf "${PLUGIN_DATA_ROOT:?}/*"
+fi
