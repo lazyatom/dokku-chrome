@@ -7,7 +7,7 @@ export CHROME_HOST_ROOT=${CHROME_HOST_ROOT:=$CHROME_ROOT}
 export PLUGIN_UNIMPLEMENTED_SUBCOMMANDS=("backup" "backup-auth" "backup-deauth" "backup-schedule" "backup-schedule-cat" "backup-set-encryption" "backup-unschedule" "backup-unset-encryption" "clone" "connect" "export" "import")
 export PLUGIN_COMMAND_PREFIX="chrome"
 export PLUGIN_CONFIG_ROOT=${PLUGIN_CONFIG_ROOT:="$DOKKU_LIB_ROOT/config/$PLUGIN_COMMAND_PREFIX"}
-export PLUGIN_DATA_ROOT=${PLUGIN_CONFIG_ROOT:="$DOKKU_LIB_ROOT/data/$PLUGIN_COMMAND_PREFIX"}
+export PLUGIN_DATA_ROOT=$CHROME_ROOT
 export PLUGIN_DATA_HOST_ROOT=$CHROME_HOST_ROOT
 export PLUGIN_PORTS=(3000)
 export PLUGIN_WAIT_PORT=3000

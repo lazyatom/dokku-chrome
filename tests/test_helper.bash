@@ -1,13 +1,18 @@
 #!/usr/bin/env bash
-export DOKKU_ROOT=/home/dokku
-export PLUGIN_COMMAND_PREFIX="chrome"
-export PLUGIN_DATA_ROOT=/var/lib/dokku/services/$PLUGIN_COMMAND_PREFIX
+source "$(dirname "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)")/config"
 
 reset_system_data() {
-  sudo docker stop `sudo docker ps -a -q` > /dev/null 2>&1 || true
-  sudo docker system prune -f > /dev/null 2>&1 || true
-  sudo -u dokku rm -rf /var/lib/dokku/services/chrome/*
-  sudo -u dokku rm -rf /home/dokku/app /home/dokku/my_app
+  local containers=$(sudo docker ps -aq)
+  if [ "$containers" != "" ]; then
+    sudo docker stop $containers > /dev/null 2>&1
+  fi
+  sudo docker system prune -f > /dev/null 2>&1
+  if [ -z $CHROME_ROOT ]; then
+    echo "CHROME_ROOT not set, can't clean up tests"
+    exit -1
+  else
+    sudo -u dokku rm -rf /home/dokku/app /home/dokku/my_app $CHROME_ROOT/*
+  fi
 }
 
 flunk() {

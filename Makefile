@@ -1,3 +1,9 @@
+SHELL=/bin/bash
+
+test: setup clean lint
+	@echo Running tests...
+	@$(QUIET) bats tests
+
 shellcheck:
 ifeq ($(shell shellcheck > /dev/null 2>&1 ; echo $$?),127)
 ifeq ($(shell uname),Darwin)
@@ -20,35 +26,26 @@ else
 endif
 endif
 
-readlink:
-ifeq ($(shell uname),Darwin)
-ifeq ($(shell greadlink > /dev/null 2>&1 ; echo $$?),127)
-	brew install coreutils
-endif
-	ln -nfs `which greadlink` tests/bin/readlink
+dokku:
+ifeq ($(shell dokku > /dev/null 2>&1 ; echo $$?),127)
+	@echo Installing dokku
+  curl https://raw.githubusercontent.com/dokku/dokku/v0.14.6/bootstrap.sh | sudo bash
 endif
 
-ci-dependencies: shellcheck bats readlink
+dependencies: dokku shellcheck bats
 
 lint:
 	# these are disabled due to their expansive existence in the codebase. we should clean it up though
 	# SC1090: Can't follow non-constant source. Use a directive to specify location.
 	# SC2034: Variable appears unused. Verify it or export it.
 	# SC2155: Declare and assign separately to avoid masking return values.
-	@echo linting...
+	@echo Linting...
 	@$(QUIET) find ./ -maxdepth 1 -not -path '*/\.*' | xargs file | egrep "shell|bash" | awk '{ print $$1 }' | sed 's/://g' | xargs shellcheck -e SC1090,SC2034,SC2155
 
-unit-tests:
-	@echo running unit tests...
-	@$(QUIET) bats tests
-
-setup: ci-dependencies
+setup: dependencies
 	bash tests/setup.sh
 
 clean:
-	-sudo docker stop `sudo docker ps -a -q`
-	sudo docker system prune -f
-	sudo -u dokku rm -rf /var/lib/dokku/services/chrome/*
-	sudo -u dokku rm -rf /home/dokku/app /home/dokku/my_app
+	. $(shell pwd)/tests/test_helper.bash && reset_system_data
 
-test: clean setup lint unit-tests
+.PHONY: test clean setup lint dependencies dokku shellcheck bats

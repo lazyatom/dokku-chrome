@@ -4,17 +4,15 @@ source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/test_helper.bash"
 source "$(dirname "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)")/config"
 export DOKKU_INSTALL_ROOT=/var/lib/dokku
 
-# Remove the plugin if it's already installed
+echo "Uninstalling plugin and clearing data..."
 sudo dokku plugin:uninstall $PLUGIN_COMMAND_PREFIX || true
-sudo rm -fr $DOKKU_INSTALL_ROOT/services/$PLUGIN_COMMAND_PREFIX
-sudo rm -fr $DOKKU_INSTALL_ROOT/config/$PLUGIN_COMMAND_PREFIX
-sudo rm -fr $DOKKU_INSTALL_ROOT/data/$PLUGIN_COMMAND_PREFIX
+sudo rm -fr $CHROME_ROOT $PLUGIN_DATA_ROOT $PLUGIN_CONFIG_ROOT
 
-# Copy the plugin files into place
+echo "Linking plugin files..."
 sudo -u dokku mkdir -p $DOKKU_INSTALL_ROOT/plugins/available/$PLUGIN_COMMAND_PREFIX $DOKKU_INSTALL_ROOT/plugins/available/$PLUGIN_COMMAND_PREFIX/subcommands
 sudo -u dokku find ./ -maxdepth 1 -type f -exec cp '{}' $DOKKU_INSTALL_ROOT/plugins/available/$PLUGIN_COMMAND_PREFIX \;
 sudo -u dokku find ./subcommands -maxdepth 1 -type f -exec cp '{}' $DOKKU_INSTALL_ROOT/plugins/available/$PLUGIN_COMMAND_PREFIX/subcommands \;
 
-# Enable and install the plugin
+echo "Enabling plugin and running installation..."
 sudo -u dokku ln -s $DOKKU_INSTALL_ROOT/plugins/available/$PLUGIN_COMMAND_PREFIX $DOKKU_INSTALL_ROOT/plugins/enabled/$PLUGIN_COMMAND_PREFIX
 sudo dokku plugin:install
